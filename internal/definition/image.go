@@ -39,12 +39,14 @@ func (img *Image) IsFullyQualified() bool {
 
 func (img *Image) String() string {
 	var sb strings.Builder
-	sb.WriteString(img.Registry)
-	if img.Project != "" {
+	if img.Registry != "" {
+		sb.WriteString(img.Registry)
 		sb.WriteString("/")
-		sb.WriteString(img.Project)
 	}
-	sb.WriteString("/")
+	if img.Project != "" {
+		sb.WriteString(img.Project)
+		sb.WriteString("/")
+	}
 	sb.WriteString(img.Image)
 	if img.Tag != "" {
 		sb.WriteString(":")

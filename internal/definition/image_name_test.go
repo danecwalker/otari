@@ -63,6 +63,12 @@ func TestToString(t *testing.T) {
 			},
 			expected: "localhost/nginx",
 		},
+		{
+			imageRef: &Image{
+				Image: "nginx",
+			},
+			expected: "nginx",
+		},
 	}
 
 	for _, tt := range tests {

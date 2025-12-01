@@ -109,7 +109,10 @@ func (q *QuadletGenerator) GenerateContainer(stack *definition.Stack, containerN
 
 	if len(container.Volumes) > 0 {
 		for _, volumeMap := range container.Volumes {
-			volumeDef := volumeMap.Destination + ":" + strings.Join(volumeMap.Options, ",")
+			volumeDef := volumeMap.Destination
+			if len(volumeMap.Options) > 0 {
+				volumeDef += ":" + strings.Join(volumeMap.Options, ",")
+			}
 			if volumeMap.Type == definition.VolumeMountTypeBind {
 				// get absolute path for host bind mounts
 				absPath, err := utils.GetAbsolutePath(volumeMap.Source)

@@ -69,7 +69,6 @@ func Generate(stack, new *definition.Stack, outputPath string, generator Generat
 		container.ContainerName = name
 		if container.Build != nil {
 			container.Image = &definition.Image{}
-			container.Image.Registry = "localhost"
 			container.Image.Image = fmt.Sprintf("%s_%s", stack.StackName, container.ContainerName)
 		}
 		sp.SetMessage(fmt.Sprintf("Generating configuration for container '%s'", container.ContainerName))
