@@ -18,10 +18,10 @@ before:
 
 builds:
   - main: ./cmd/otari
-  - flags:
+    flags:
       - -tags=production
       - -v
-  - env:
+    env:
       - CGO_ENABLED=0
     goos:
       - linux
