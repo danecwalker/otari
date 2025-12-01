@@ -1,6 +1,6 @@
 package rules
 
-import "github.com/danecwalker/podstack/internal/definition"
+import "github.com/danecwalker/otari/internal/definition"
 
 type RuleError struct {
 	Message string

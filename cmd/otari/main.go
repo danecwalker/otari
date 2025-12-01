@@ -6,24 +6,35 @@ import (
 	"log"
 	"os"
 
-	"github.com/danecwalker/podstack/internal/commands"
-	"github.com/danecwalker/podstack/internal/podman"
-	"github.com/danecwalker/podstack/internal/spinners"
-	"github.com/danecwalker/podstack/internal/systemd"
+	"github.com/danecwalker/otari/internal/commands"
+	"github.com/danecwalker/otari/internal/podman"
+	"github.com/danecwalker/otari/internal/spinners"
+	"github.com/danecwalker/otari/internal/systemd"
 	"github.com/fatih/color"
 	"github.com/urfave/cli/v3"
 )
 
+var version = "dev"
+var commit = "none"
+var date = "unknown"
+
 func main() {
 	printLogo()
-	systemCheck()
 
 	cmd := &cli.Command{
-		Name: "podstack",
+		Name: "otari",
 		Commands: []*cli.Command{
 			{
+				Name:  "version",
+				Usage: "Print the version information",
+				Action: func(ctx context.Context, c *cli.Command) error {
+					fmt.Printf("Version: %s\nCommit: %s\nDate: %s\n", version, commit, date)
+					return nil
+				},
+			},
+			{
 				Name:  "start",
-				Usage: "Start the podstack",
+				Usage: "Start the stack",
 				Flags: []cli.Flag{
 					&cli.StringFlag{
 						Name:    "file",
@@ -34,7 +45,44 @@ func main() {
 				},
 				Action: func(ctx context.Context, c *cli.Command) error {
 					stackPath := c.String("file")
+					systemCheck()
 					commands.Start(ctx, stackPath)
+					return nil
+				},
+			},
+			{
+				Name:  "stop",
+				Usage: "Stop the stack",
+				Flags: []cli.Flag{
+					&cli.StringFlag{
+						Name:    "file",
+						Value:   "",
+						Usage:   "Path to the stack definition file",
+						Aliases: []string{"f"},
+					},
+				},
+				Action: func(ctx context.Context, c *cli.Command) error {
+					stackPath := c.String("file")
+					systemCheck()
+					commands.Stop(ctx, stackPath)
+					return nil
+				},
+			},
+			{
+				Name:  "remove",
+				Usage: "Remove the stack",
+				Flags: []cli.Flag{
+					&cli.StringFlag{
+						Name:    "file",
+						Value:   "",
+						Usage:   "Path to the stack definition file",
+						Aliases: []string{"f"},
+					},
+				},
+				Action: func(ctx context.Context, c *cli.Command) error {
+					stackPath := c.String("file")
+					systemCheck()
+					commands.Remove(ctx, stackPath)
 					return nil
 				},
 			},

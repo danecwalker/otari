@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/danecwalker/podstack/internal/definition"
+	"github.com/danecwalker/otari/internal/definition"
 )
 
 func ValidateContainerNames(s *definition.Stack) []*RuleError {

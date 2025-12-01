@@ -3,7 +3,7 @@ package spinners
 import (
 	"time"
 
-	"github.com/danecwalker/podstack/pkg/spinner"
+	"github.com/danecwalker/otari/pkg/spinner"
 	"github.com/fatih/color"
 )
 

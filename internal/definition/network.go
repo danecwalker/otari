@@ -1,6 +1,9 @@
 package definition
 
-import "gopkg.in/yaml.v3"
+import (
+	"github.com/danecwalker/otari/internal/hasher"
+	"gopkg.in/yaml.v3"
+)
 
 type NetworkDriver string
 
@@ -13,8 +16,9 @@ const (
 )
 
 type Network struct {
-	NetworkName string        `yaml:"-"`
-	Driver      NetworkDriver `yaml:"driver"`
+	NetworkName     string        `yaml:"-"`
+	Driver          NetworkDriver `yaml:"driver"`
+	PersistOnRemove bool          `yaml:"persist_on_remove"`
 }
 
 func (n *NetworkDriver) UnmarshalYAML(value *yaml.Node) error {
@@ -36,5 +40,14 @@ func (n *NetworkDriver) UnmarshalYAML(value *yaml.Node) error {
 		*n = NetworkDriverDefault
 	}
 
+	return nil
+}
+
+func (n *Network) MarshalHash(h *hasher.Hash) error {
+	if n == nil {
+		return nil
+	}
+	h.Hasher.Write([]byte(n.NetworkName))
+	h.Hasher.Write([]byte(n.Driver))
 	return nil
 }

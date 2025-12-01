@@ -2,6 +2,7 @@ package podman
 
 import (
 	"bytes"
+	"context"
 	"fmt"
 	"os/exec"
 )
@@ -22,4 +23,28 @@ func ParsePodmanVersion(version string) (int, int, int) {
 		return 0, 0, 0
 	}
 	return major, minor, patch
+}
+
+func ActiveContainers(ctx context.Context) ([]string, error) {
+	cmd := exec.CommandContext(ctx, "podman", "ps", "--format", "{{.Names}}")
+	out, err := cmd.Output()
+	if err != nil {
+		return nil, err
+	}
+	lines := bytes.Split(bytes.TrimSpace(out), []byte{'\n'})
+	var containers []string
+	for _, line := range lines {
+		containers = append(containers, string(line))
+	}
+	return containers, nil
+}
+
+func RemoveNetwork(ctx context.Context, networkName string) error {
+	cmd := exec.CommandContext(ctx, "podman", "network", "rm", "-f", networkName)
+	return cmd.Run()
+}
+
+func RemoveVolume(ctx context.Context, volumeName string) error {
+	cmd := exec.CommandContext(ctx, "podman", "volume", "rm", "-f", volumeName)
+	return cmd.Run()
 }

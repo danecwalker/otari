@@ -3,7 +3,7 @@ package rules
 import (
 	"fmt"
 
-	"github.com/danecwalker/podstack/internal/definition"
+	"github.com/danecwalker/otari/internal/definition"
 )
 
 func ValidateNetworkNames(s *definition.Stack) []*RuleError {

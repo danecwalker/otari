@@ -1,7 +1,7 @@
 package quadlets
 
 import (
-	"github.com/danecwalker/podstack/internal/generate"
+	"github.com/danecwalker/otari/internal/generate"
 )
 
 type QuadletGenerator struct {

@@ -5,8 +5,8 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/danecwalker/podstack/internal/definition"
-	"github.com/danecwalker/podstack/internal/utils"
+	"github.com/danecwalker/otari/internal/definition"
+	"github.com/danecwalker/otari/internal/utils"
 )
 
 // GenerateContainer implements generate.Generator.
@@ -140,19 +140,19 @@ func (q *QuadletGenerator) GenerateContainer(stack *definition.Stack, containerN
 	}
 
 	// Service section
-	if container.Restart.IsNo() {
+	if container.RestartPolicy.IsNo() {
 		serviceProperties = append(serviceProperties, [2]string{
 			"Restart", "no",
 		})
-	} else if container.Restart.IsAlways() {
+	} else if container.RestartPolicy.IsAlways() {
 		serviceProperties = append(serviceProperties, [2]string{
 			"Restart", "always",
 		})
-	} else if container.Restart.IsOnFailure() {
+	} else if container.RestartPolicy.IsOnFailure() {
 		serviceProperties = append(serviceProperties, [2]string{
 			"Restart", "on-failure",
 		})
-	} else if container.Restart.IsUnlessStopped() {
+	} else if container.RestartPolicy.IsUnlessStopped() {
 		serviceProperties = append(serviceProperties, [2]string{
 			"Restart", "always",
 		})

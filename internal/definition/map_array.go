@@ -2,8 +2,10 @@ package definition
 
 import (
 	"fmt"
+	"sort"
 	"strings"
 
+	"github.com/danecwalker/otari/internal/hasher"
 	"gopkg.in/yaml.v3"
 )
 
@@ -39,4 +41,18 @@ func (ma *MapArray) UnmarshalYAML(node *yaml.Node) error {
 	*ma = result
 
 	return nil
+}
+
+func (ma MapArray) MarshalHash(h *hasher.Hash) {
+	// To ensure consistent hashing, sort the keys before processing.
+	keys := make([]string, 0, len(ma))
+	for k := range ma {
+		keys = append(keys, k)
+	}
+	sort.Strings(keys)
+
+	for _, k := range keys {
+		h.Hasher.Write([]byte(k))
+		h.Hasher.Write([]byte(ma[k]))
+	}
 }

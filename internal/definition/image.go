@@ -5,6 +5,7 @@ import (
 	"regexp"
 	"strings"
 
+	"github.com/danecwalker/otari/internal/hasher"
 	"gopkg.in/yaml.v3"
 )
 
@@ -98,4 +99,8 @@ func (img *Image) UnmarshalYAML(node *yaml.Node) error {
 	*img = *parsedImage
 
 	return nil
+}
+
+func (img Image) MarshalHash(h *hasher.Hash) {
+	h.Hasher.Write([]byte(img.String()))
 }

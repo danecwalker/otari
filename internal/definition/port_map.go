@@ -6,6 +6,7 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/danecwalker/otari/internal/hasher"
 	"gopkg.in/yaml.v3"
 )
 
@@ -137,4 +138,8 @@ func (p *PortMap) String() string {
 	sb.WriteString(p.Protocol)
 
 	return sb.String()
+}
+
+func (p PortMap) MarshalHash(h *hasher.Hash) {
+	h.Hasher.Write([]byte(p.String()))
 }

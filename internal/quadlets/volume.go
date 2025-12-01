@@ -4,8 +4,8 @@ import (
 	"bytes"
 	"fmt"
 
-	"github.com/danecwalker/podstack/internal/definition"
-	"github.com/danecwalker/podstack/internal/utils"
+	"github.com/danecwalker/otari/internal/definition"
+	"github.com/danecwalker/otari/internal/utils"
 )
 
 func (q *QuadletGenerator) GenerateVolume(stack *definition.Stack, volumeName string) ([]byte, error) {

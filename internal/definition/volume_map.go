@@ -5,6 +5,7 @@ import (
 	"regexp"
 	"strings"
 
+	"github.com/danecwalker/otari/internal/hasher"
 	"gopkg.in/yaml.v3"
 )
 
@@ -66,4 +67,8 @@ func (vm *VolumeMap) UnmarshalYAML(value *yaml.Node) error {
 
 	*vm = *parsedVM
 	return nil
+}
+
+func (vm VolumeMap) MarshalHash(h *hasher.Hash) {
+	h.Hasher.Write([]byte(vm.String()))
 }

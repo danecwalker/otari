@@ -5,6 +5,7 @@ import (
 )
 
 type Stack struct {
+	StackName  string                `yaml:"-"`
 	Containers map[string]*Container `yaml:"containers"`
 	Volumes    map[string]*Volume    `yaml:"volumes"`
 	Networks   map[string]*Network   `yaml:"networks"`

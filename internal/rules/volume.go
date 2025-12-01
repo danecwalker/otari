@@ -5,7 +5,7 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/danecwalker/podstack/internal/definition"
+	"github.com/danecwalker/otari/internal/definition"
 )
 
 func ValidateVolumeNames(s *definition.Stack) []*RuleError {

@@ -3,6 +3,7 @@ package definition
 import (
 	"strings"
 
+	"github.com/danecwalker/otari/internal/hasher"
 	"gopkg.in/yaml.v3"
 )
 
@@ -29,4 +30,12 @@ func (sa *StringArray) UnmarshalYAML(node *yaml.Node) error {
 	*sa = StringArray(strings.Join(result, " "))
 
 	return nil
+}
+
+func (sa StringArray) String() string {
+	return string(sa)
+}
+
+func (sa StringArray) MarshalHash(h *hasher.Hash) {
+	h.Hasher.Write([]byte(sa))
 }

@@ -3,6 +3,7 @@ package definition
 import (
 	"fmt"
 
+	"github.com/danecwalker/otari/internal/hasher"
 	"gopkg.in/yaml.v3"
 )
 
@@ -55,4 +56,11 @@ func (r *RestartPolicy) UnmarshalYAML(value *yaml.Node) error {
 	}
 
 	return nil
+}
+
+func (r RestartPolicy) MarshalHash(h *hasher.Hash) {
+	h.Hasher.Write([]byte(r.Condition))
+	if r.Condition == "on-failure" {
+		h.Hasher.Write([]byte(fmt.Sprintf(":%d", r.MaxAttempts)))
+	}
 }
