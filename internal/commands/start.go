@@ -73,9 +73,22 @@ func Start(ctx context.Context, stackPath string) {
 			return
 		}
 
-		imagesSet := make(map[string]struct{})
+		imagesSet := make(map[string]struct {
+			Remote bool
+			Build  *definition.Build
+		})
 		for _, container := range new.Containers {
-			imagesSet[container.Image.String()] = struct{}{}
+			if container.Build != nil {
+				imagesSet[container.ContainerName] = struct {
+					Remote bool
+					Build  *definition.Build
+				}{Remote: false, Build: container.Build}
+			} else if container.Image != nil {
+				imagesSet[container.Image.String()] = struct {
+					Remote bool
+					Build  *definition.Build
+				}{Remote: true, Build: nil}
+			}
 		}
 
 		for image := range imagesSet {
@@ -83,36 +96,75 @@ func Start(ctx context.Context, stackPath string) {
 
 			// Check if image exists
 			if !podman.ImageExists(ctx, image) {
-				sp.SetMessage(fmt.Sprintf("Pulling image '%s'", image))
-				cmd := podman.ImagePull(ctx, image)
-				hasStderr := true
-				stderr, err := cmd.StderrPipe()
-				if err != nil {
-					hasStderr = false
-				}
-
-				if err := cmd.Start(); err != nil {
-					sp.FinishWithError(fmt.Sprintf("Failed to start pulling image '%s'", image))
-					color.New(color.FgWhite).Println("    " + err.Error())
-					os.Exit(1)
-				}
-
-				// Read stderr for progress
-				if hasStderr {
-					scanner := bufio.NewScanner(stderr)
-					for scanner.Scan() {
-						line := scanner.Text()
-						sp.Println(color.New(color.FgWhite).Sprintf(" >  %s", line))
+				if imagesSet[image].Remote {
+					sp.SetMessage(fmt.Sprintf("Pulling image '%s'", image))
+					cmd := podman.ImagePull(ctx, image)
+					hasStderr := true
+					stderr, err := cmd.StderrPipe()
+					if err != nil {
+						hasStderr = false
 					}
-				}
 
-				if err := cmd.Wait(); err != nil {
-					sp.FinishWithError(fmt.Sprintf("Failed to pull image '%s'", image))
-					color.New(color.FgWhite).Println("    " + err.Error())
-					os.Exit(1)
-				}
+					if err := cmd.Start(); err != nil {
+						sp.FinishWithError(fmt.Sprintf("Failed to start pulling image '%s'", image))
+						color.New(color.FgWhite).Println("    " + err.Error())
+						os.Exit(1)
+					}
 
-				sp.FinishWithSuccess(fmt.Sprintf("Pulled image '%s'.", image))
+					// Read stderr for progress
+					if hasStderr {
+						scanner := bufio.NewScanner(stderr)
+						for scanner.Scan() {
+							line := scanner.Text()
+							sp.Println(color.New(color.FgWhite).Sprintf(" >  %s", line))
+						}
+					}
+
+					if err := cmd.Wait(); err != nil {
+						sp.FinishWithError(fmt.Sprintf("Failed to pull image '%s'", image))
+						color.New(color.FgWhite).Println("    " + err.Error())
+						os.Exit(1)
+					}
+
+					sp.FinishWithSuccess(fmt.Sprintf("Pulled image '%s'.", image))
+				} else {
+					sp.SetMessage(fmt.Sprintf("Building image '%s'", image))
+					cmd, err := podman.ImageBuild(ctx, imagesSet[image].Build, fmt.Sprintf("%s_%s", stack.StackName, image))
+					if err != nil {
+						sp.FinishWithError(fmt.Sprintf("Failed to prepare build for image '%s'", image))
+						color.New(color.FgWhite).Println("    " + err.Error())
+						os.Exit(1)
+					}
+
+					hasStderr := true
+					stderr, err := cmd.StderrPipe()
+					if err != nil {
+						hasStderr = false
+					}
+
+					if err := cmd.Start(); err != nil {
+						sp.FinishWithError(fmt.Sprintf("Failed to start building image '%s'", image))
+						color.New(color.FgWhite).Println("    " + err.Error())
+						os.Exit(1)
+					}
+
+					// Read stderr for progress
+					if hasStderr {
+						scanner := bufio.NewScanner(stderr)
+						for scanner.Scan() {
+							line := scanner.Text()
+							sp.Println(color.New(color.FgWhite).Sprintf(" >  %s", line))
+						}
+					}
+
+					if err := cmd.Wait(); err != nil {
+						sp.FinishWithError(fmt.Sprintf("Failed to build image '%s'", image))
+						color.New(color.FgWhite).Println("    " + err.Error())
+						os.Exit(1)
+					}
+
+					sp.FinishWithSuccess(fmt.Sprintf("Built image '%s'.", image))
+				}
 			} else {
 				sp.FinishWithInfo(fmt.Sprintf("Image '%s' already exists.", image))
 			}

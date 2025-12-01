@@ -7,11 +7,11 @@ import (
 )
 
 func Success(msg string) string {
-	return fmt.Sprintf("%s %s", color.New(color.FgGreen, color.Bold).Sprint("[✔]"), msg)
+	return fmt.Sprintf("%s %s", color.New(color.FgGreen, color.Bold).Sprint("[+]"), msg)
 }
 
 func Error(msg string) string {
-	return fmt.Sprintf("%s %s", color.New(color.FgRed, color.Bold).Sprint("[✘]"), msg)
+	return fmt.Sprintf("%s %s", color.New(color.FgRed, color.Bold).Sprint("[x]"), msg)
 }
 
 func Info(msg string) string {

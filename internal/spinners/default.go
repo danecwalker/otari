@@ -12,8 +12,8 @@ func DefaultSpinner() *spinner.Spinner {
 		[]string{
 			"[|]", "[/]", "[-]", "[\\]",
 		},
-		spinner.WithSuccessSymbol(color.New(color.FgGreen, color.Bold).Sprint("[✔]")),
-		spinner.WithErrorSymbol(color.New(color.FgRed, color.Bold).Sprint("[✘]")),
+		spinner.WithSuccessSymbol(color.New(color.FgGreen, color.Bold).Sprint("[+]")),
+		spinner.WithErrorSymbol(color.New(color.FgRed, color.Bold).Sprint("[x]")),
 		spinner.WithInfoSymbol(color.New(color.FgCyan, color.Bold).Sprint("[i]")),
 	)
 	sp.Enable(100 * time.Millisecond)

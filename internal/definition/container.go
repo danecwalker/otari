@@ -11,6 +11,7 @@ type Container struct {
 	Environment   MapArray    `yaml:"environment"`
 	// Healthcheck   *Healthcheck  `yaml:"healthcheck"`
 	Image         *Image        `yaml:"image"`
+	Build         *Build        `yaml:"build"`
 	Init          bool          `yaml:"init"`
 	Labels        MapArray      `yaml:"labels"`
 	Networks      []string      `yaml:"networks"`
@@ -42,6 +43,9 @@ func (c *Container) MarshalHash(h *hasher.Hash) error {
 	// }
 	if c.Image != nil {
 		c.Image.MarshalHash(h)
+	}
+	if c.Build != nil {
+		c.Build.MarshalHash(h)
 	}
 	if c.Init {
 		h.Hasher.Write([]byte{1})

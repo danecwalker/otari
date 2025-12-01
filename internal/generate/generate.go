@@ -67,6 +67,10 @@ func Generate(stack, new *definition.Stack, outputPath string, generator Generat
 		}
 		sp := spinners.DefaultSpinner()
 		container.ContainerName = name
+		if container.Build != nil {
+			container.Image.Registry = "localhost"
+			container.Image.Image = fmt.Sprintf("%s_%s", stack.StackName, container.ContainerName)
+		}
 		sp.SetMessage(fmt.Sprintf("Generating configuration for container '%s'", container.ContainerName))
 		out, err := generator.GenerateContainer(stack, container.ContainerName)
 		if err != nil {

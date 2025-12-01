@@ -25,3 +25,8 @@ func StackNameFromPath(path string) string {
 	ext := filepath.Ext(filepathWithoutExt)
 	return filepathWithoutExt[0 : len(filepathWithoutExt)-len(ext)]
 }
+
+func PathExists(path string) bool {
+	_, err := os.Stat(path)
+	return err == nil
+}
