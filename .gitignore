@@ -44,3 +44,4 @@ stack/
 data_dev/
 # Added by goreleaser init:
 dist/
+videos/
