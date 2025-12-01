@@ -11,7 +11,7 @@ func GetAbsolutePath(path string) (string, error) {
 		if err != nil {
 			return "", err
 		}
-		return absPath + string(os.PathSeparator) + path, nil
+		return filepath.Join(absPath, path), nil
 	}
 	return path, nil
 }
