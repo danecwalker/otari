@@ -36,10 +36,8 @@ go.work.sum
 .vscode/
 
 # Test Files
-stack.yaml
-stack.yml
-otari.yml
-otari.yaml
+/otari.yml
+/otari.yaml
 stack/
 data_dev/
 # Added by goreleaser init:

@@ -41,6 +41,11 @@ func isHostPath(p string) bool {
 		return true
 	}
 
+	// check for relative paths
+	if filepath.Clean(p) == "." || strings.HasPrefix(p, "."+string(os.PathSeparator)) || strings.HasPrefix(p, ".."+string(os.PathSeparator)) {
+		return true
+	}
+
 	return false
 }
 

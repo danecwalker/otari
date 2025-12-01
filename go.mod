@@ -3,6 +3,7 @@ module github.com/danecwalker/otari
 go 1.24.2
 
 require (
+	github.com/BurntSushi/toml v1.5.0
 	github.com/akamensky/base58 v0.0.0-20210829145138-ce8bf8802e8f
 	github.com/fatih/color v1.18.0
 	github.com/stretchr/testify v1.11.1

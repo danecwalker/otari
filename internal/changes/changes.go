@@ -4,48 +4,44 @@ import (
 	"context"
 	"fmt"
 	"os"
-	"path/filepath"
+	"time"
 
+	"github.com/BurntSushi/toml"
 	"github.com/danecwalker/otari/internal/definition"
 	"github.com/danecwalker/otari/internal/hasher"
 	"github.com/danecwalker/otari/internal/utils"
-	"github.com/fatih/color"
-	"gopkg.in/yaml.v3"
 )
 
 type StackData struct {
-	Containers map[string]string `yaml:"containers"`
-	Volumes    map[string]string `yaml:"volumes"`
-	Networks   map[string]string `yaml:"networks"`
+	Version     int               `toml:"version"`
+	GeneratedAt time.Time         `toml:"generated_at"`
+	Containers  map[string]string `toml:"containers,omitempty"`
+	Volumes     map[string]string `toml:"volumes,omitempty"`
+	Networks    map[string]string `toml:"networks,omitempty"`
 }
 
 func DetectChanges(ctx context.Context, newStack *definition.Stack) (new *definition.Stack, deleted *definition.Stack, total int, err error) {
-	// check if stack exists in data dir
-	dataDir := utils.DataDirectory()
-	if err := os.MkdirAll(dataDir, 0755); err != nil {
-		fmt.Println(utils.Error("Failed to create data directory."))
-		color.New(color.FgWhite).Println("    " + err.Error())
-		os.Exit(1)
-	}
-
-	stackFilePath := filepath.Join(dataDir, newStack.StackName+".yaml")
-	_, err = os.Stat(stackFilePath)
-	if os.IsNotExist(err) {
-		// stack does not exist, everything is new
+	lockPath := newStack.StackName + ".lock"
+	// check if lock file exists
+	if !utils.PathExists(lockPath) {
+		// no lock file, everything is new
 		return newStack, nil, -1, nil
-	} else if err != nil {
-		return nil, nil, -1, err
 	}
 
 	// read existing stack file
-	data, err := os.ReadFile(stackFilePath)
+	data, err := os.ReadFile(lockPath)
 	if err != nil {
 		return nil, nil, -1, err
 	}
 
 	var stackData StackData
-	if err := yaml.Unmarshal(data, &stackData); err != nil {
+	if err := toml.Unmarshal(data, &stackData); err != nil {
 		return nil, nil, -1, err
+	}
+
+	if stackData.Version != 1 {
+		// unsupported version, treat everything as new
+		return newStack, nil, -1, fmt.Errorf("unsupported stack data version: %d", stackData.Version)
 	}
 
 	// stack data contains hashes of existing resources
@@ -120,20 +116,15 @@ func DetectChanges(ctx context.Context, newStack *definition.Stack) (new *defini
 }
 
 func SaveStackData(stack *definition.Stack) error {
-	dataDir := utils.DataDirectory()
-	if err := os.MkdirAll(dataDir, 0755); err != nil {
-		fmt.Println(utils.Error("Failed to create data directory."))
-		color.New(color.FgWhite).Println("    " + err.Error())
-		os.Exit(1)
-	}
-
-	stackFilePath := filepath.Join(dataDir, stack.StackName+".yaml")
 	stackData := StackData{
 		Containers: make(map[string]string),
 		Volumes:    make(map[string]string),
 		Networks:   make(map[string]string),
 	}
 	for name, container := range stack.Containers {
+		if container.Build != nil {
+			container.Image = nil // do not hash build info
+		}
 		hash, err := hasher.MarshalHashableB58(container)
 		if err != nil {
 			return err
@@ -154,12 +145,23 @@ func SaveStackData(stack *definition.Stack) error {
 		}
 		stackData.Networks[name] = hash
 	}
-	data, err := yaml.Marshal(&stackData)
+
+	stackData.Version = 1
+	stackData.GeneratedAt = time.Now().UTC().Truncate(time.Second)
+
+	lockPath := stack.StackName + ".lock"
+	f, err := os.Create(lockPath)
 	if err != nil {
 		return err
 	}
-	if err := os.WriteFile(stackFilePath, data, 0644); err != nil {
+	defer f.Close()
+
+	enc := toml.NewEncoder(f)
+	enc.Indent = ""
+	err = enc.Encode(stackData)
+	if err != nil {
 		return err
 	}
+
 	return nil
 }

@@ -14,11 +14,3 @@ func OutputLocation() string {
 	}
 	return filepath.Join(homeDir, ".config", "containers", "systemd")
 }
-
-func DataDirectory() string {
-	homeDir, err := os.UserHomeDir()
-	if err != nil {
-		return "data"
-	}
-	return filepath.Join(homeDir, ".local", "share", "containers", "data")
-}

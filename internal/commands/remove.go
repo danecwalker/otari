@@ -4,7 +4,6 @@ import (
 	"context"
 	"fmt"
 	"os"
-	"path/filepath"
 	"slices"
 
 	"github.com/danecwalker/otari/internal/definition"
@@ -186,19 +185,12 @@ func Remove(ctx context.Context, stackPath string) {
 		os.Exit(1)
 	}
 
-	// remove data file for the stack
-	dataDir := utils.DataDirectory()
-	if err := os.MkdirAll(dataDir, 0755); err != nil {
-		fmt.Println(utils.Error("Failed to create data directory."))
-		color.New(color.FgWhite).Println("    " + err.Error())
-		os.Exit(1)
-	}
-
-	stackFilePath := filepath.Join(dataDir, stack.StackName+".yaml")
-	if err := os.Remove(stackFilePath); err != nil {
+	// remove lock file
+	lockPath := stack.StackName + ".lock"
+	if err := os.Remove(lockPath); err != nil {
 		// if the file does not exist, ignore the error
 		if !os.IsNotExist(err) {
-			fmt.Println(utils.Error("Failed to remove stack data file."))
+			fmt.Println(utils.Error("Failed to remove stack lock file."))
 			color.New(color.FgWhite).Println("    " + err.Error())
 			os.Exit(1)
 		}
