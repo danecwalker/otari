@@ -44,5 +44,5 @@ func Logs(ctx context.Context, stackPath string, containerName string) {
 		os.Exit(1)
 	}
 
-	fmt.Println(logs)
+	fmt.Println(string(logs))
 }
