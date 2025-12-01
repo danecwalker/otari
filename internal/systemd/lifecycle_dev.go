@@ -40,3 +40,7 @@ func DeleteUnitFile(unitName string) error {
 
 	return nil
 }
+
+func GetLogs(unitName string) ([]byte, error) {
+	return []byte(""), nil
+}

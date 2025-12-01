@@ -10,6 +10,7 @@ import (
 	"github.com/danecwalker/otari/internal/podman"
 	"github.com/danecwalker/otari/internal/spinners"
 	"github.com/danecwalker/otari/internal/systemd"
+	"github.com/danecwalker/otari/internal/utils"
 	"github.com/fatih/color"
 	"github.com/urfave/cli/v3"
 )
@@ -83,6 +84,35 @@ func main() {
 					stackPath := c.String("file")
 					systemCheck()
 					commands.Remove(ctx, stackPath)
+					return nil
+				},
+			},
+			{
+				Name:  "logs",
+				Usage: "View logs for the stack or a specific container",
+				Flags: []cli.Flag{
+					&cli.StringFlag{
+						Name:    "file",
+						Value:   "",
+						Usage:   "Path to the stack definition file",
+						Aliases: []string{"f"},
+					},
+				},
+				Arguments: []cli.Argument{
+					&cli.StringArg{
+						Name:      "container",
+						UsageText: "Name of the container to view logs for (optional)",
+					},
+				},
+				Action: func(ctx context.Context, c *cli.Command) error {
+					stackPath := c.String("file")
+					containerName := c.StringArg("container")
+					if containerName == "" {
+						fmt.Println(utils.Error("Please specify a container name."))
+						return nil
+					}
+					systemCheck()
+					commands.Logs(ctx, stackPath, containerName)
 					return nil
 				},
 			},

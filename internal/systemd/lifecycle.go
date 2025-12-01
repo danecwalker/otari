@@ -45,3 +45,8 @@ func DeleteUnitFile(unitName string) error {
 
 	return nil
 }
+
+func GetLogs(unitName string) ([]byte, error) {
+	cmd := exec.Command("journalctl", "--user", "-u", unitName, "-I", "-t", unitName, "-o", "cat")
+	return cmd.Output()
+}
