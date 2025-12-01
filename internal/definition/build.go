@@ -10,6 +10,7 @@ type Build struct {
 	ContainerFile string   `yaml:"containerfile"`
 	Tags          []string `yaml:"tags"`
 	Args          MapArray `yaml:"args"`
+	Target        string   `yaml:"target"`
 }
 
 func (b *Build) UnmarshalYAML(value *yaml.Node) error {
@@ -46,5 +47,6 @@ func (b *Build) MarshalHash(h *hasher.Hash) error {
 		h.Hasher.Write([]byte(tag))
 	}
 	b.Args.MarshalHash(h)
+	h.Hasher.Write([]byte(b.Target))
 	return nil
 }

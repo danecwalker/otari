@@ -75,6 +75,10 @@ func ImageBuild(ctx context.Context, build *definition.Build, image string) (*ex
 		cmdSlice = append(cmdSlice, "-t", tag)
 	}
 
+	if build.Target != "" {
+		cmdSlice = append(cmdSlice, "--target", build.Target)
+	}
+
 	cmd := exec.CommandContext(ctx, "podman", append(cmdSlice, absPath)...)
 	return cmd, nil
 }
